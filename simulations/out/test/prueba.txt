@@ -1,0 +1,33 @@
+<xml_root>
+<message>
+    <node_id>23</node_id>
+    <num_neigh>15</num_neigh>
+    <new_inf>10</new_inf>
+    <alr_inf>0</alr_inf>
+    <alpha>5</alpha>
+    <alpha_tries>45</alpha_tries>
+    <jumps>99</jumps>
+    <round>15</round>
+</message>
+<message>
+    <node_id>666</node_id>
+    <num_neigh>15</num_neigh>
+    <new_inf>10</new_inf>
+    <alr_inf>0</alr_inf>
+    <alpha>7</alpha>
+    <alpha_tries>45</alpha_tries>
+    <jumps>99</jumps>
+    <round>20</round>
+</message>
+<message>
+    <node_id>666</node_id>
+    <num_neigh>15</num_neigh>
+    <new_inf>10</new_inf>
+    <alr_inf>0</alr_inf>
+    <alpha>10</alpha>
+    <alpha_tries>45</alpha_tries>
+    <jumps>99</jumps>
+    <round>20</round>
+</message>
+
+</xml_root>

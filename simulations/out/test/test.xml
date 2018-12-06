@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<hola>
+<message>
+    <node_id>23</node_id>
+    <num_neigh>9</num_neigh>
+    <new_inf>9</new_inf>
+    <alr_inf>0</alr_inf>
+    <alpha>10</alpha>
+    <alpha_tries>1</alpha_tries>
+    <jumps>1</jumps>
+    <round>1</round>
+</message>
+<total_tries>1</total_tries>
+</hola>
+

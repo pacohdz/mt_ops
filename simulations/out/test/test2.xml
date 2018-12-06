@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<hola>
+<message>
+    <node_id>23</node_id>
+    <num_neigh>9</num_neigh>
+    <new_inf>0</new_inf>
+    <alr_inf>0</alr_inf>
+    <alpha>1</alpha>
+    <alpha_tries>1</alpha_tries>
+    <jumps>0</jumps>
+    <round>1</round>
+</message>
+<message>
+    <node_id>66</node_id>
+    <num_neigh>9</num_neigh>
+    <new_inf>0</new_inf>
+    <alr_inf>0</alr_inf>
+    <alpha>1</alpha>
+    <alpha_tries>2</alpha_tries>
+    <jumps>0</jumps>
+    <round>2</round>
+</message>
+<message>
+    <node_id>99</node_id>
+    <num_neigh>9</num_neigh>
+    <new_inf>9</new_inf>
+    <alr_inf>0</alr_inf>
+    <alpha>10</alpha>
+    <alpha_tries>3</alpha_tries>
+    <jumps>1</jumps>
+    <round>3</round>
+</message>
+<total_tries>3</total_tries>
+</hola>
+
