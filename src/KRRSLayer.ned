@@ -1,0 +1,51 @@
+//
+// The model for the Randomized Rumor Spreading layer
+//
+// @author : Asanga Udugama (adu@comnets.uni-bremen.de)
+// @date   : 25-aug-2016
+//
+//
+
+package ops;
+
+simple KRRSLayer
+{
+     parameters:
+         
+		// unique address of the node         
+		string ownMACAddress;
+        
+        /// Added for Unicast/Broadcast version ///
+        
+        // number of nodes in network
+      	int numberOfNodes = default(5);
+        
+        // number of messages/data created during simulation
+        int numberOfData = default(1);
+        
+        // maximum amount of hops to forward for a data
+        int maximumHopCount = default(10);
+        
+        /// End of addition ///
+        
+        // size of cache in bytes - zero means unlimited caching
+        int maximumCacheSize @unit(byte) = default(0byte);
+        		
+        // logging at layer - 0 = disabled, 1 = enabled
+        int logging = default(1);
+        
+        // icon used
+      	@display("i=block/transport");
+        
+	gates:
+	    
+	    // interface to the upper layer (which may be the application)
+	    input upperLayerIn;
+	    output upperLayerOut;
+	    
+	    // interface to the lower layer (which may be the link adaptation layer)
+	    input lowerLayerIn;
+	    output lowerLayerOut;
+	    
+}
+

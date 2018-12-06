@@ -1,0 +1,50 @@
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+
+# Auto generated data
+Makefile
+.tkenvrc
+.kdev4
+.cmdenv-log
+.vscode
+OPS.kdev4
+ws_vscode_ops.code-workspace
+out
+src/out
+src/out/Makefile
+simulations/out/input_data
+simulations/out/output_data
+simulations/.idea
+modules/inet
+simulations/Results/
+ops-simu
+
+# Misc
+*.swp
+.cmdenv-log
