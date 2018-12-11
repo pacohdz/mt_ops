@@ -27,4 +27,4 @@ OMNET_OUTPUT_DIR=./out/
 #
 # It is a subdirectory of $OMNET_OUTPUT_DIR
 
-#SIM_OUTPUT_DIR=mySimulationOutput
+# SIM_OUTPUT_DIR=mySimulationOutput
