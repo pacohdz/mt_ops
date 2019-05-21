@@ -4,7 +4,6 @@
 //
 
 #include "KWirelessInterface.h"
-
 #include "KBaseNodeInfo.h"
 #include <cmath>
 #include <fstream>
@@ -34,7 +33,7 @@ void KWirelessInterface::initialize(int stage)
 
         // set other parameters
         broadcastMACAddress = "FF:FF:FF:FF:FF:FF";
-        
+ 
     } else if (stage == 1) {
 
 
@@ -181,7 +180,7 @@ void KWirelessInterface::handleMessage(cMessage *msg)
             send(neighListMsg, "upperLayerOut");
 
         } else { // Added for broadcast version
-            EV_INFO << "[WARNING]THIS NODE DOES NOT HAVE NEIGHBORS![WARNING]\n";
+            // EV_INFO << "[WARNING]THIS NODE DOES NOT HAVE NEIGHBORS![WARNING]\n";
         }
 
         // setup next event to build neighbourhood node list and send to forwarding layer
@@ -401,7 +400,7 @@ void KWirelessInterface::finish()
     }*/
     
     // Print neighbors
-    if (getParentModule()->getIndex() == 0){
+    /* if (getParentModule()->getIndex() == 0){
         ofstream myfile;
         myfile.open (resultdir + "node_neighbors.csv", ofstream::out | ofstream::app);
         
@@ -410,7 +409,7 @@ void KWirelessInterface::finish()
         }
         myfile << "-,-\n";
         myfile.close();
-    }
+    } */
     
     // remove send msg timeout
     if (sendPacketTimeoutEvent->isScheduled()) {

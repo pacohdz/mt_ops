@@ -51,7 +51,7 @@ void KPromoteApp::initialize(int stage)
         }
         if (dataGeneratingNodeIndex == 0){
             dataGeneratingNodeIndex = rnd_int; // For complete random scenarios
-            //dataGeneratingNodeIndex = 0; // For "best" and "worst" scenarios node 0 generates data only
+            // dataGeneratingNodeIndex = 0; // Center node 0 generates data only
             //EV_INFO << "Node: " << rnd_int << " generates Information \n";
         }
   
@@ -108,7 +108,9 @@ void KPromoteApp::initialize(int stage)
             dataTimeoutEvent = new cMessage("Data Timeout Event");
             dataTimeoutEvent->setKind(93);
             double firstGenTime = simTime().dbl() + uniform(1.0, notificationGenStartMaxTime, usedRNG);
-            scheduleAt(firstGenTime, dataTimeoutEvent);            
+            // scheduleAt(firstGenTime, dataTimeoutEvent);
+            scheduleAt(simTime().dbl() + 0.010, dataTimeoutEvent); // Broadcast modification
+
         }
         
         

@@ -36,28 +36,33 @@ void KRRSLayer::initialize(int stage)
             std::random_device rd;
             std::mt19937 rng(rd());
             std::uniform_int_distribution<int> uni(0, NUMNODES - 1);
-            
+
             cout <<  "NUM NODES: " << NUMNODES << "\n";
-            commTableEntries = NUMNODES * 100; // This is an arbitrary initial number of senders in the commTable
+            commTableEntries = NUMNODES * 20; // This is an arbitrary initial number of senders in the commTable
             string strSender;
             for (int i = 0; i <= commTableEntries; ++i){
-                 auto random_sender = uni(rng);
-                 strSender = "sender" + to_string(i);
-                commTable.insert({strSender, random_sender});
+                auto random_sender = uni(rng);
+                strSender = "sender" + to_string(i);
+                commTable.insert({strSender, random_sender}); // Random node selected
+                // commTable.insert({strSender, 0});  // Center node is always selected to spread the infection
+
+                if (i == 0){
+                    // Log start of dissemination
+                    disseminationStartEnd.insert({"start", simTime().str()});
+                }
             }
+                      
+            // EV_INFO << "----------- Communication Table -------------\n";
+            // for (pair<string, int> element : commTable){        
+            //     EV_INFO << element.first << " = " << element.second << "\n";
+            // }
+            // EV_INFO << "----------- End Communication Table -------------\n";
             
-            // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            // DISABLE THIS FOR COMPLETE RANDOM SCENARIOS
-            // For best and worst scenarios node zero starts always the communication
-            //    commTable.at("sender0") = 0;
-            // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            
-            /*EV_INFO << "----------- Communication Table -------------\n";
-            for (pair<string, int> element : commTable){
-                //cout << element.first << " = " << element.second << "\n";                
-                EV_INFO << element.first << " = " << element.second << "\n";
-            }
-            EV_INFO << "----------- End Communication Table -------------\n";*/
+            // EV_INFO << "----------- Arrivals Table -------------\n";
+            // for (pair<string, double> element : timeTable){        
+            //     EV_INFO << element.first << " = " << element.second << "\n";
+            // }
+            // EV_INFO << "----------- End Arrivals Table -------------\n";
         }
         /// End of addition ///
 
@@ -230,12 +235,6 @@ void KRRSLayer::handleMessage(cMessage *msg)
 
             cacheEntry->lastAccessedTime = simTime().dbl();
             
-            // Save dissemination start time
-            if ( x == 0){
-                string start = simTime().str();
-                disseminationStartEnd.insert({ "start", start });
-           }
-
             delete msg;
 
         // feedback message arrived from the upper layer (app layer)
@@ -251,7 +250,9 @@ void KRRSLayer::handleMessage(cMessage *msg)
             /*if (logging) {EV_INFO << KRRSLAYER_SIMMODULEINFO << ">!<NM>!<NC>!<" <<
                                 neighListMsg->getNeighbourNameListArraySize() << ">!<CS>!<"
                                     << cacheList.size() << "\n";}*/
-            
+
+           
+
             if (infectedNodes < NUMNODES) {
                 if ( commTable.find("sender" + to_string(x))->second == getParentModule()->getIndex() && (firstDataCreated == true) && go == true ){
                     if (neighListMsg->getNeighbourNameListArraySize() > 0 && cacheList.size() > 0 ) {
@@ -300,20 +301,30 @@ void KRRSLayer::handleMessage(cMessage *msg)
                         EV_INFO << "<message>\n"
                                     << "<node_id>" << xmlOut.node_id << "</node_id>\n"
                                     << "<num_neigh>" << xmlOut.num_neigh << "</num_neigh>\n"
+                                    << "<success>" << xmlOut.success << "</success>\n"
                                     << "<new_inf>" << xmlOut.new_inf << "</new_inf>\n"
                                     << "<alr_inf>" << xmlOut.alr_inf << "</alr_inf>\n"
                                     << "<alpha>" << xmlOut.alpha << "</alpha>\n"
-                                    << "<alpha_tries>" << xmlOut.alpha_tries << "</alpha_tries>\n"
+                                    << "<tries>" << xmlOut.alpha_tries << "</tries>\n"
                                     << "<jumps>" << xmlOut.jumps << "</jumps>\n"
                                     << "<round>" << xmlOut.round << "</round>\n"
+                                    << "<timestamp>" << simTime() << "</timestamp>\n"
                                     << "</message>\n";
                                 
                         EV_INFO << "--------------------------------------------------------------------\n";
                         
                         // Save data as CSV file
-                        string strStats = to_string(xmlOut.node_id) + "," + to_string(xmlOut.num_neigh) + "," + to_string(xmlOut.new_inf) + "," + to_string(xmlOut.alr_inf) + "," + to_string(xmlOut.alpha ) + "," + to_string(xmlOut.alpha_tries) + "," + to_string(xmlOut.jumps) + "," + to_string(xmlOut.round);
-                        saveFile(strStats);
+                        string strStats = to_string(xmlOut.node_id) + "," + to_string(xmlOut.num_neigh) + "," + to_string(xmlOut.new_inf) + "," + to_string(xmlOut.alr_inf) + "," + to_string(xmlOut.alpha ) + "," + to_string(xmlOut.alpha_tries) + "," + to_string(xmlOut.jumps) + "," + to_string(xmlOut.round) + "," + xmlOut.success;
+                        //saveFile(strStats);
+                        saveTimeStamp(simTime().str());
                         
+                        // ONLY FOR STATIC SCENARIOS: Stop simulation after one try
+                        // if (x == 0){
+                        //     delete msg;
+                        //     endSimulation();
+                        // }
+                        // -------------------------- //
+
                         if (x < commTableEntries) {
                             x++;
                             
@@ -346,19 +357,22 @@ void KRRSLayer::handleMessage(cMessage *msg)
                             EV_INFO << "<message>\n"
                                     << "<node_id>" << xmlOut.node_id << "</node_id>\n"
                                     << "<num_neigh>" << xmlOut.num_neigh << "</num_neigh>\n"
+                                    << "<success>" << xmlOut.success << "</success>\n"
                                     << "<new_inf>" << xmlOut.new_inf << "</new_inf>\n"
                                     << "<alr_inf>" << xmlOut.alr_inf << "</alr_inf>\n"
                                     << "<alpha>" << xmlOut.alpha << "</alpha>\n"
-                                    << "<alpha_tries>" << xmlOut.alpha_tries << "</alpha_tries>\n"
+                                    << "<tries>" << xmlOut.alpha_tries << "</tries>\n"
                                     << "<jumps>" << xmlOut.jumps << "</jumps>\n"
-                                    << "<round>" << xmlOut.round << "</round>\n"
+                                    << "<rounds>" << xmlOut.round << "</rounds>\n"
+                                    << "<timestamp>" << simTime()<< "</timestamp>\n"
                                     << "</message>\n";
                                     
                             EV_INFO << "--------------------------------------------------------------------\n";
                             
                             // Save data as CSV file
-                            string strStats = to_string(xmlOut.node_id) + "," + to_string(xmlOut.num_neigh) + "," + to_string(xmlOut.new_inf) + "," + to_string(xmlOut.alr_inf) + "," + to_string(xmlOut.alpha ) + "," + to_string(xmlOut.alpha_tries) + "," + to_string(xmlOut.jumps) + "," + to_string(xmlOut.round);
-                            saveFile(strStats);
+                            string strStats = to_string(xmlOut.node_id) + "," + to_string(xmlOut.num_neigh) + "," + to_string(xmlOut.new_inf) + "," + to_string(xmlOut.alr_inf) + "," + to_string(xmlOut.alpha ) + "," + to_string(xmlOut.alpha_tries) + "," + to_string(xmlOut.jumps) + "," + to_string(xmlOut.round) + "," + xmlOut.success;
+                            //saveFile(strStats);
+                            saveTimeStamp(simTime().str());
                             
                         }
                         
@@ -535,6 +549,30 @@ int KRRSLayer::saveFile(string stats)
     
 }
 
+int KRRSLayer::saveTimeStamp(string ts){
+    // Save Timestamp to CSV file
+    string resultdir = "./simulations/out/test/";
+    
+    ofstream myfile;
+    myfile.open (resultdir + "sim_ts.csv", ofstream::out | ofstream::app);
+    myfile << ts << "\n";
+    myfile.close();
+    return 0;
+}
+
+string KRRSLayer::fileTimeStamp(){
+    //Get timestamp for files
+    timeval curTime;
+    gettimeofday(&curTime, NULL);
+    int milli = curTime.tv_usec / 1000;
+
+    char buffer [80];
+    strftime(buffer, 80, "%Y-%m-%d_%H-%M-%S", localtime(&curTime.tv_sec));
+    string fileTS = (string) buffer + "_" + to_string(milli);
+
+    return fileTS;
+}
+
 
 KRRSLayer::SimOutData KRRSLayer::simOutData(KNeighbourListMsg *neighListMsg, CacheEntry *cacheEntry)
 {
@@ -603,16 +641,19 @@ KRRSLayer::SimOutData KRRSLayer::simOutData(KNeighbourListMsg *neighListMsg, Cac
 
     alphaTries++;
     string eventLabel;
+    string success;
     int statAlphaTries = 0; // For statistics displaying purposes only
     if (newInfected > 0){
         stateJumps++;
         statAlphaTries = alphaTries;
-        alphaTries = 0; // If at least one neighbor was successfully infected the alpha changes thus the counter is restarted
+        alphaTries = 0; // If at least one neighbor was successfully infected the alpha changes and the counter is restarted
         alpha =  alpha + newInfected;
         eventLabel = "[SUCCESSFUL EVENT]";
+        success = "1";
     }else{
         statAlphaTries = alphaTries;
         eventLabel = "[FAILED EVENT]";
+        success = "0";
     }
         
   
@@ -633,7 +674,7 @@ KRRSLayer::SimOutData KRRSLayer::simOutData(KNeighbourListMsg *neighListMsg, Cac
     
     // If the node has no output data structure, create a new one and save current values
     if (!found) {
-        outData =  new SimOutData;
+        outData = new SimOutData;
         outData->node_id = getParentModule()->getIndex();
         outData->num_neigh = numNeigh;
         outData->alr_inf = alreadyInfected;
@@ -643,6 +684,8 @@ KRRSLayer::SimOutData KRRSLayer::simOutData(KNeighbourListMsg *neighListMsg, Cac
         outData->jumps = stateJumps;
         outData->round = x + 1;
         outData->event_label = eventLabel;
+        outData->success = success;
+
     } else {
         // Update structure
         outData->num_neigh = numNeigh;
@@ -653,6 +696,7 @@ KRRSLayer::SimOutData KRRSLayer::simOutData(KNeighbourListMsg *neighListMsg, Cac
         outData->jumps = stateJumps;
         outData->round = x + 1;
         outData->event_label = eventLabel;
+        outData->success = success;
     }
     
     return *outData;
@@ -661,22 +705,24 @@ KRRSLayer::SimOutData KRRSLayer::simOutData(KNeighbourListMsg *neighListMsg, Cac
 void KRRSLayer::finish()
 {
     // Add "-" character at EOF to separate each run results from the others.
+    string ts = fileTimeStamp();
     string resultdir = "./simulations/out/test/";
     if (getParentModule()->getIndex() == 0){
         ofstream myfile;
-        myfile.open (resultdir + "sim_data.csv", ofstream::out | ofstream::app);
-        myfile << "-,-,-,-,-,-,-,-\n";
+        myfile.open (resultdir + "sim_ts.csv", ofstream::out | ofstream::app);
+        myfile << "-\n";
         myfile.close();
     }
     
-    // Save dissemination end time
+    // Save to file start/end dissemination and inter-arrival times
     if (getParentModule()->getIndex() == 0){
-        string end = simTime().str();
-        disseminationStartEnd.insert({ "end", end });
+        //double end = timeTable.find("sender" + to_string(x))->second;
+
+        disseminationStartEnd.insert({"end", simTime().str()});
         
         ofstream file;
         file.open (resultdir + "dissemination.csv", ofstream::out | ofstream::app);
-        file << disseminationStartEnd.find("start")->second + "," + disseminationStartEnd.find("end")->second + "\n";
+        file << disseminationStartEnd.find("start")->second << "," << disseminationStartEnd.find("end")->second << "\n";
         file.close();
     }  
     

@@ -21,6 +21,8 @@
 #include <vector>
 #include <fstream>
 #include <string>
+#include <iterator>
+#include <ctime>
 
 #include "KOPSMsg_m.h"
 #include "KInternalMsg_m.h"
@@ -43,8 +45,13 @@ class KRRSLayer: public cSimpleModule
             unordered_map<string,int> map2;
             return map2;
         }
+            static unordered_map<string,double> map3(){
+            unordered_map<string,double> map3;
+            return map3;
+        }
         static unordered_map<string,string> globalCache;
         static unordered_map<string,int> commTable;
+        static unordered_map<string,string> disseminationStartEnd;
         static int commTableEntries;
         static int x;
         static bool firstDataCreated;
@@ -54,7 +61,6 @@ class KRRSLayer: public cSimpleModule
         static int alphaTries;
         static bool go;
         static int stateJumps;
-        static unordered_map<string,string> disseminationStartEnd;
             
     protected:
         virtual void initialize(int stage);
@@ -114,12 +120,15 @@ class KRRSLayer: public cSimpleModule
             int jumps;
             int round;
             string event_label;
+            string success;
         };
         
         list<SimOutData*> simOutDataList;
         string broadcastMACAddress;
         
         int saveFile(string stats);
+        int saveTimeStamp(string ts);
+        string fileTimeStamp();
         SimOutData simOutData(KNeighbourListMsg *neighListMsg, CacheEntry *cacheEntry);
         
         list<AppInfo*> registeredAppList;
