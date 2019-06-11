@@ -43,13 +43,15 @@ void KRRSLayer::initialize(int stage)
             for (int i = 0; i <= commTableEntries; ++i){
                 auto random_sender = uni(rng);
                 strSender = "sender" + to_string(i);
-                commTable.insert({strSender, random_sender}); // Random node selected
-                // commTable.insert({strSender, 0});  // Center node is always selected to spread the infection
-
                 if (i == 0){
                     // Log start of dissemination
                     disseminationStartEnd.insert({"start", simTime().str()});
+                    commTable.insert({strSender, 0}); // Start with the first infected node
+                } else {
+                    commTable.insert({strSender, random_sender}); // Random node selected
+                    //commTable.insert({strSender, 0});  // Center node is always selected to spread the infection
                 }
+                
             }
                       
             // EV_INFO << "----------- Communication Table -------------\n";
@@ -58,11 +60,11 @@ void KRRSLayer::initialize(int stage)
             // }
             // EV_INFO << "----------- End Communication Table -------------\n";
             
-            // EV_INFO << "----------- Arrivals Table -------------\n";
-            // for (pair<string, double> element : timeTable){        
-            //     EV_INFO << element.first << " = " << element.second << "\n";
-            // }
-            // EV_INFO << "----------- End Arrivals Table -------------\n";
+        //     EV_INFO << "----------- Arrivals Table -------------\n";
+        //     for (pair<string, double> element : timeTable){        
+        //         EV_INFO << element.first << " = " << element.second << "\n";
+        //     }
+        //     EV_INFO << "----------- End Arrivals Table -------------\n";
         }
         /// End of addition ///
 
@@ -231,6 +233,7 @@ void KRRSLayer::handleMessage(cMessage *msg)
                 infectedNodes = 1;
                 alpha = 1;
                 firstDataCreated = true;
+                EV_INFO << "<msg_created>:" << simTime() << "</msg_created>";
             }
 
             cacheEntry->lastAccessedTime = simTime().dbl();
@@ -285,10 +288,11 @@ void KRRSLayer::handleMessage(cMessage *msg)
                         dataMsg->setFinalDestinationNodeName(cacheEntry->finalDestinationNodeName.c_str());
                         
                         
-                        
+                        y += 1;
                         EV_INFO << "--------------------------------------------------------------------\n";
                         /* EV_INFO << "NODE " << getParentModule()->getIndex() << " HAS " << numNeigh << " NEIGHBORS\n";*/
-                        EV_INFO << "NODE " << getParentModule()->getIndex() << " HAS DATA AND IS ITS TURN. BROADCASTING TO NEIGHBORS. ROUND "<< (x+1) <<" \n";
+                        // EV_INFO << "NODE " << getParentModule()->getIndex() << " HAS DATA AND IS ITS TURN. BROADCASTING TO NEIGHBORS. ROUND "<< (x+1) <<" \n";
+                        EV_INFO << "NODE " << getParentModule()->getIndex() << " HAS DATA AND IS ITS TURN. BROADCASTING TO NEIGHBORS. ROUND "<< y <<" \n";
                                                 
                         // Check data for XML-style output
                         SimOutData xmlOut = simOutData(neighListMsg, cacheEntry);
@@ -307,7 +311,8 @@ void KRRSLayer::handleMessage(cMessage *msg)
                                     << "<alpha>" << xmlOut.alpha << "</alpha>\n"
                                     << "<tries>" << xmlOut.alpha_tries << "</tries>\n"
                                     << "<jumps>" << xmlOut.jumps << "</jumps>\n"
-                                    << "<round>" << xmlOut.round << "</round>\n"
+                                    // << "<round>" << xmlOut.round << "</round>\n"
+                                    << "<round>" << y << "</round>\n"
                                     << "<timestamp>" << simTime() << "</timestamp>\n"
                                     << "</message>\n";
                                 
@@ -342,39 +347,39 @@ void KRRSLayer::handleMessage(cMessage *msg)
                     
                         // The current sender does not have data to send, so continue with the next one
                         
-                        EV_INFO << "--------------------------------------------------------------------\n";
-                        EV_INFO << "[FAILED EVENT] NODE " << getParentModule()->getIndex() << " DOESN'T HAVE DATA AND IS ITS TURN. ROUND "<< (x+1) <<" \n"; 
+                        // EV_INFO << "--------------------------------------------------------------------\n";
+                        // EV_INFO << "[FAILED EVENT] NODE " << getParentModule()->getIndex() << " DOESN'T HAVE DATA AND IS ITS TURN. ROUND "<< (x+1) <<" \n"; 
                         
                         // Print sim values with XML format
-                        if (cacheList.size() == 0) {
+                        //if (cacheList.size() == 0) {
                             // The current node does not have data so there is not cache to look up
-                            CacheEntry *cacheEntry = NULL;
+                            //CacheEntry *cacheEntry = NULL;
                             
-                            // Check data for XML-style output
-                            SimOutData xmlOut = simOutData(neighListMsg, cacheEntry);
+                            // // Check data for XML-style output
+                            // SimOutData xmlOut = simOutData(neighListMsg, cacheEntry);
                             
-                            // Format output as XML tags for log parsing
-                            EV_INFO << "<message>\n"
-                                    << "<node_id>" << xmlOut.node_id << "</node_id>\n"
-                                    << "<num_neigh>" << xmlOut.num_neigh << "</num_neigh>\n"
-                                    << "<success>" << xmlOut.success << "</success>\n"
-                                    << "<new_inf>" << xmlOut.new_inf << "</new_inf>\n"
-                                    << "<alr_inf>" << xmlOut.alr_inf << "</alr_inf>\n"
-                                    << "<alpha>" << xmlOut.alpha << "</alpha>\n"
-                                    << "<tries>" << xmlOut.alpha_tries << "</tries>\n"
-                                    << "<jumps>" << xmlOut.jumps << "</jumps>\n"
-                                    << "<rounds>" << xmlOut.round << "</rounds>\n"
-                                    << "<timestamp>" << simTime()<< "</timestamp>\n"
-                                    << "</message>\n";
+                            // // Format output as XML tags for log parsing
+                            // EV_INFO << "<message>\n"
+                            //         << "<node_id>" << xmlOut.node_id << "</node_id>\n"
+                            //         << "<num_neigh>" << xmlOut.num_neigh << "</num_neigh>\n"
+                            //         << "<success>" << xmlOut.success << "</success>\n"
+                            //         << "<new_inf>" << xmlOut.new_inf << "</new_inf>\n"
+                            //         << "<alr_inf>" << xmlOut.alr_inf << "</alr_inf>\n"
+                            //         << "<alpha>" << xmlOut.alpha << "</alpha>\n"
+                            //         << "<tries>" << xmlOut.alpha_tries << "</tries>\n"
+                            //         << "<jumps>" << xmlOut.jumps << "</jumps>\n"
+                            //         << "<rounds>" << xmlOut.round << "</rounds>\n"
+                            //         << "<timestamp>" << simTime()<< "</timestamp>\n"
+                            //         << "</message>\n";
                                     
-                            EV_INFO << "--------------------------------------------------------------------\n";
+                            // EV_INFO << "--------------------------------------------------------------------\n";
                             
-                            // Save data as CSV file
-                            string strStats = to_string(xmlOut.node_id) + "," + to_string(xmlOut.num_neigh) + "," + to_string(xmlOut.new_inf) + "," + to_string(xmlOut.alr_inf) + "," + to_string(xmlOut.alpha ) + "," + to_string(xmlOut.alpha_tries) + "," + to_string(xmlOut.jumps) + "," + to_string(xmlOut.round) + "," + xmlOut.success;
-                            //saveFile(strStats);
-                            saveTimeStamp(simTime().str());
+                            // // Save data as CSV file
+                            // string strStats = to_string(xmlOut.node_id) + "," + to_string(xmlOut.num_neigh) + "," + to_string(xmlOut.new_inf) + "," + to_string(xmlOut.alr_inf) + "," + to_string(xmlOut.alpha ) + "," + to_string(xmlOut.alpha_tries) + "," + to_string(xmlOut.jumps) + "," + to_string(xmlOut.round) + "," + xmlOut.success;
+                            // //saveFile(strStats);
+                            // saveTimeStamp(simTime().str());
                             
-                        }
+                        //}
                         
                         if (x < commTableEntries) {
                             x++;
@@ -387,7 +392,8 @@ void KRRSLayer::handleMessage(cMessage *msg)
                 delete msg;
             } else {
                 
-                totalInfectionTries = x; 
+                // totalInfectionTries = x; 
+                totalInfectionTries = y; // For only infected node selection
                 
                 EV_INFO << "<total_tries>" <<  totalInfectionTries << "</total_tries>\n";               
                 EV_INFO << "ALL NODES INFECTED. IT TOOK " << totalInfectionTries << " TRIES TO INFECT ALL NODES\n";
