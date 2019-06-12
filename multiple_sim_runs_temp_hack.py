@@ -24,7 +24,7 @@ def modify_seed(seed):
         filedata = file.read()
 
     # Replace the target string
-    if seed == 0:
+    if seed == 0:###
         filedata = filedata.replace('seed-0-mt = ${{repetition}}'.format(42), 'seed-0-mt = ' + str(seed) )
     else:
         filedata = filedata.replace('seed-0-mt = ' + str((seed - 1)), 'seed-0-mt = ' + str(seed) )

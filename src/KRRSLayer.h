@@ -141,7 +141,7 @@ class KRRSLayer: public cSimpleModule
 unordered_map<string,string> KRRSLayer::globalCache = KRRSLayer::map1();
 unordered_map<string,int> KRRSLayer::commTable = KRRSLayer::map2();
 int KRRSLayer::commTableEntries = 0;
-int KRRSLayer::x = 0;  // Counter used to advance in the comm table
+int KRRSLayer::x = 0;  // Counter used to advance in the comm table!!!!
 int KRRSLayer::y = 0; // Counter used when only infected nodes are selected.
 bool KRRSLayer::firstDataCreated = false;
 int KRRSLayer::infectedNodes = 0;
