@@ -233,7 +233,7 @@ void KRRSLayer::handleMessage(cMessage *msg)
                 infectedNodes = 1;
                 alpha = 1;
                 firstDataCreated = true;
-                EV_INFO << "<msg_created>:" << simTime() << "</msg_created>";
+                EV_INFO << "<msg_created>" << simTime() << "</msg_created>";
             }
 
             cacheEntry->lastAccessedTime = simTime().dbl();
