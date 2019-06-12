@@ -52,7 +52,7 @@ void KPromoteApp::initialize(int stage)
         if (dataGeneratingNodeIndex == 0){
             //dataGeneratingNodeIndex = rnd_int; // For complete random scenarios
             dataGeneratingNodeIndex = 0; // Node 0 generates the initial data
-            //EV_INFO << "Node: " << rnd_int << " generates Information \n"; ####
+            //EV_INFO << "Node: " << rnd_int << " generates Information \n";
         }
   
     } else if (stage == 1) {
