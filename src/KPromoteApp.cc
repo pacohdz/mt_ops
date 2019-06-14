@@ -107,10 +107,10 @@ void KPromoteApp::initialize(int stage)
             // create and setup notification generation trigger
             dataTimeoutEvent = new cMessage("Data Timeout Event");
             dataTimeoutEvent->setKind(93);
-            double firstGenTime = simTime().dbl() + uniform(1.0, notificationGenStartMaxTime, usedRNG);
-            // scheduleAt(firstGenTime, dataTimeoutEvent);
+            // double firstGenTime = simTime().dbl() + uniform(1.0, notificationGenStartMaxTime, usedRNG);
+            //double firstGenTime = simTime().dbl() + uniform(0.1, 1, usedRNG); // Broadcast modification
+            //scheduleAt(firstGenTime, dataTimeoutEvent);
             scheduleAt(simTime().dbl() + 0.010, dataTimeoutEvent); // Broadcast modification
-
         }
         
         
