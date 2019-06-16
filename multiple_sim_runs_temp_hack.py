@@ -6,9 +6,9 @@ from subprocess import call
 import datetime
 
 def main():
-    runs = 20000
-    for x in range (0, runs):
-        modify_seed(x)
+    runs = 10000
+    for x in range (1, runs+1):  # for x in range (0, runs):
+        modify_seed(x+10000)  # modify_seed(x)
         call(["./ops-simu-run.sh", "-m", "cmdenv"])
         print ("### Simulation run %s" %x + " done! ###")
         if (x+1) == runs:
@@ -24,7 +24,7 @@ def modify_seed(seed):
         filedata = file.read()
 
     # Replace the target string
-    if seed == 0:
+    if seed == 10001:
         filedata = filedata.replace('seed-0-mt = ${{repetition}}'.format(42), 'seed-0-mt = ' + str(seed) )
     else:
         filedata = filedata.replace('seed-0-mt = ' + str((seed - 1)), 'seed-0-mt = ' + str(seed) )
