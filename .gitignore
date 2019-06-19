@@ -40,7 +40,7 @@ simulations/out/output_data
 simulations/.idea
 modules/inet
 simulations/Results/
-.zip
+*.zip
 
 # Misc
 *.swp
