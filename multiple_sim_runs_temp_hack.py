@@ -6,7 +6,7 @@ from subprocess import call
 import datetime
 
 def main():
-    runs = 5000
+    runs = 10000
     for x in range (0, runs):
         modify_seed(x)
         call(["./ops-simu-run.sh", "-m", "cmdenv"])
