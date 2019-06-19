@@ -35,15 +35,12 @@ Makefile
 .vscode
 OPS.kdev4
 ws_vscode_ops.code-workspace
-out
-src/out
-src/out/Makefile
 simulations/out/input_data
 simulations/out/output_data
 simulations/.idea
 modules/inet
 simulations/Results/
-ops-simu
+*.zip
 
 # Misc
 *.swp
