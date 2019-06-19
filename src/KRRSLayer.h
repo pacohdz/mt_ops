@@ -62,6 +62,10 @@ class KRRSLayer: public cSimpleModule
         static int alphaTries;
         static bool go;
         static int stateJumps;
+        static vector<int> infectedList;
+        static vector<int> gi_list;
+        static int randInfNode;
+
             
     protected:
         virtual void initialize(int stage);
@@ -81,7 +85,7 @@ class KRRSLayer: public cSimpleModule
         /// Added for Unicast/Broadcast version ///
         int NUMNODES;
         int NUMDATA;
-        vector<int> infectedList;
+        /// Aqui iba el vector
         int alreadyInfected;
         int newInfected;
         int tries;
@@ -131,6 +135,7 @@ class KRRSLayer: public cSimpleModule
         int saveTimeStamp(string ts);
         string fileTimeStamp();
         SimOutData simOutData(KNeighbourListMsg *neighListMsg, CacheEntry *cacheEntry);
+        int randomInfected(CacheEntry *cacheEntry);
         
         list<AppInfo*> registeredAppList;
         list<CacheEntry*> cacheList;
@@ -151,6 +156,9 @@ int KRRSLayer::alphaTries = 0;
 bool KRRSLayer::go = true;
 int KRRSLayer::stateJumps = 0;
 unordered_map<string,string> KRRSLayer::disseminationStartEnd = KRRSLayer::map1();
+vector<int> KRRSLayer::infectedList;
+vector<int> KRRSLayer::gi_list;
+int KRRSLayer::randInfNode = 0;
 
 #define KRRSLAYER_SIMMODULEINFO       ">!<" << simTime() << ">!<" << getParentModule()->getFullName()
 

@@ -38,7 +38,7 @@ void KRRSLayer::initialize(int stage)
             std::uniform_int_distribution<int> uni(0, NUMNODES - 1);
 
             cout <<  "NUM NODES: " << NUMNODES << "\n";
-            commTableEntries = NUMNODES * 20; // This is an arbitrary initial number of senders in the commTable
+            commTableEntries = 1; // -- DISABLED -- // NUMNODES * 20; // This is an arbitrary initial number of senders in the commTable
             string strSender;
             for (int i = 0; i <= commTableEntries; ++i){
                 auto random_sender = uni(rng);
@@ -53,7 +53,7 @@ void KRRSLayer::initialize(int stage)
                 }
                 
             }
-                      
+
             // EV_INFO << "----------- Communication Table -------------\n";
             // for (pair<string, int> element : commTable){        
             //     EV_INFO << element.first << " = " << element.second << "\n";
@@ -254,15 +254,13 @@ void KRRSLayer::handleMessage(cMessage *msg)
                                 neighListMsg->getNeighbourNameListArraySize() << ">!<CS>!<"
                                     << cacheList.size() << "\n";}*/
 
-           
-
             if (infectedNodes < NUMNODES) {
-                if ( commTable.find("sender" + to_string(x))->second == getParentModule()->getIndex() && (firstDataCreated == true) && go == true ){
+                //if ( commTable.find("sender" + to_string(x))->second == getParentModule()->getIndex() && (firstDataCreated == true) && go == true ){
+                if ( randInfNode == getParentModule()->getIndex() && (firstDataCreated == true) ){
                     if (neighListMsg->getNeighbourNameListArraySize() > 0 && cacheList.size() > 0 ) {
 
                         // if there are nodes in the neighbourhood and entries in the cache
                         // send a randomly selected cached data out
-
                         int cacheIndex = 0;
                         /*if (cacheList.size() > 1) {
                             cacheIndex = intuniform(0, (cacheList.size() - 1));
@@ -287,7 +285,8 @@ void KRRSLayer::handleMessage(cMessage *msg)
                         dataMsg->setValidUntilTime(cacheEntry->validUntilTime);
                         dataMsg->setFinalDestinationNodeName(cacheEntry->finalDestinationNodeName.c_str());
                         
-                        
+                        send(dataMsg, "lowerLayerOut");
+
                         y += 1;
                         EV_INFO << "--------------------------------------------------------------------\n";
                         /* EV_INFO << "NODE " << getParentModule()->getIndex() << " HAS " << numNeigh << " NEIGHBORS\n";*/
@@ -322,6 +321,9 @@ void KRRSLayer::handleMessage(cMessage *msg)
                         string strStats = to_string(xmlOut.node_id) + "," + to_string(xmlOut.num_neigh) + "," + to_string(xmlOut.new_inf) + "," + to_string(xmlOut.alr_inf) + "," + to_string(xmlOut.alpha ) + "," + to_string(xmlOut.alpha_tries) + "," + to_string(xmlOut.jumps) + "," + to_string(xmlOut.round) + "," + xmlOut.success;
                         //saveFile(strStats);
                         saveTimeStamp(simTime().str());
+
+                        // Select a random infected node for the next round
+                        randomInfected(cacheEntry);
                         
                         // ONLY FOR STATIC SCENARIOS: Stop simulation after one try
                         // if (x == 0){
@@ -335,7 +337,7 @@ void KRRSLayer::handleMessage(cMessage *msg)
                             
                         }
                         
-                        send(dataMsg, "lowerLayerOut");
+                        
                         go =  false; // Broadcast done
                         
                         
@@ -343,7 +345,7 @@ void KRRSLayer::handleMessage(cMessage *msg)
                             << dataMsg->getDestinationAddress() << ">!<" << dataMsg->getDataName() << ">!<" << dataMsg->getGoodnessValue() << ">!<"
                             << dataMsg->getByteLength() << "\n";} */
                     
-                    } else {//if ( commTable.find("sender" + to_string(x))->second == getParentModule()->getIndex() && (firstDataCreated == true)  && go == true) { 
+                    }  else { // if ( commTable.find("sender" + to_string(x))->second == getParentModule()->getIndex() && (firstDataCreated == true)  && go == true) { 
                     
                         // The current sender does not have data to send, so continue with the next one
                         
@@ -380,12 +382,13 @@ void KRRSLayer::handleMessage(cMessage *msg)
                             // saveTimeStamp(simTime().str());
                             
                         //}
+                    
                         
-                        if (x < commTableEntries) {
-                            x++;
-                        }
+                        // if (x < commTableEntries) {
+                        //     x++;
+                        // }
 
-                        go = true; // Next commTable entry
+                        // go = true; // Next commTable entry
                     }
                 }
                 
@@ -485,15 +488,14 @@ void KRRSLayer::handleMessage(cMessage *msg)
                         temp = temp + "," + to_string(nodeIndex);
                         globalCache[messageID] = temp;
                         EV_INFO << "GLOBAL CACHE: " << globalCache.find(messageID)->second << "\n";
-                        
+                           
                         // Count the number of infected nodes
                         infectedNodes = count(temp.begin(), temp.end(), ',');
                         if (infectedNodes == NUMNODES - 1){
                             infectedNodes++;
                             EV_INFO << "<infected_nodes>" << infectedNodes << "</infected_nodes>\n";
                             EV_INFO << "TOTAL INFECTED NODES = " << infectedNodes << "\n";
-                        }
-                        
+                        }                       
                    // }
                 }
                 
@@ -706,6 +708,39 @@ KRRSLayer::SimOutData KRRSLayer::simOutData(KNeighbourListMsg *neighListMsg, Cac
     }
     
     return *outData;
+}
+
+int KRRSLayer::randomInfected(CacheEntry *cacheEntry)
+{
+
+    // Select a random infected node
+    size_t pos = 0;
+    string strNodeIndex;
+    string delimiter = ",";
+    
+
+    // Extract node indices from the global cache string
+    string strNodeIndices = globalCache.find(cacheEntry->dataName)->second;
+
+    // Since the string looks like 1,2,3,4,5 a comma is added at the end to extract all nodes in the next function
+    strNodeIndices =  strNodeIndices + ",";
+    int j = 0;
+    while ((pos = strNodeIndices.find(delimiter)) != std::string::npos) {
+        strNodeIndex = strNodeIndices.substr(0, pos);
+
+        if( std::find(gi_list.begin(), gi_list.end(), stoi(strNodeIndex) ) != gi_list.end() ){
+            // The node id is already in the list so don't update
+            strNodeIndices.erase(0, pos + delimiter.length());
+        } else {
+            gi_list.push_back(stoi(strNodeIndex)); // Save the infected nodes to a list                       
+            strNodeIndices.erase(0, pos + delimiter.length());
+        }
+        j++;
+    }
+    auto vect_size = gi_list.size();
+    int randIndex = rand() % vect_size;
+    randInfNode = gi_list[randIndex];
+    // EV_INFO << "Vector size: "<< vect_size << " Rand index  " << randIndex << " corresponds to node: " << randInfNode << "\n";
 }
 
 void KRRSLayer::finish()

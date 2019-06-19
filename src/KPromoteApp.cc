@@ -110,7 +110,7 @@ void KPromoteApp::initialize(int stage)
             // double firstGenTime = simTime().dbl() + uniform(1.0, notificationGenStartMaxTime, usedRNG);
             //double firstGenTime = simTime().dbl() + uniform(0.1, 1, usedRNG); // Broadcast modification
             //scheduleAt(firstGenTime, dataTimeoutEvent);
-            scheduleAt(simTime().dbl() + 0.010, dataTimeoutEvent); // Broadcast modification
+            scheduleAt(simTime().dbl(), dataTimeoutEvent); // Broadcast modification
         }
         
         
