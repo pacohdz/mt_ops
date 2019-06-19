@@ -13,7 +13,7 @@ def main():
         print ("### Simulation run %s" %x + " done! ###")
         if (x+1) == runs:
             reset_file(x)
-        sleep(0.01)
+        sleep(0.1)
 
 
 def modify_seed(seed):
