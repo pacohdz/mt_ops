@@ -6,14 +6,14 @@ from subprocess import call
 import datetime
 
 def main():
-    runs = 10000
+    runs = 1000
     for x in range (0, runs):
         modify_seed(x)
         call(["./ops-simu-run.sh", "-m", "cmdenv"])
         print ("### Simulation run %s" %x + " done! ###")
         if (x+1) == runs:
             reset_file(x)
-        # sleep(0.100)
+        sleep(0.01)
 
 
 def modify_seed(seed):
