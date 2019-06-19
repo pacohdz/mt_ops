@@ -1,0 +1,1 @@
+-DHAVE_SWAPCONTEXT -DWITH_QTENV -DWITH_OSG -DWITH_TKENV -DWITH_MPI -DHAVE_PCAP -DXMLPARSER=libxml -DWITH_PARSIM -DWITH_NETBUILDER  -O2 -DNDEBUG=1 -fPIC  -fno-stack-protector   -Imodules/KeetchiLib/lib -I/home/paco/workspace/inet/src -I. -I/home/paco/omnetpp-5.0/include
