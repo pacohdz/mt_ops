@@ -85,7 +85,7 @@ class KRRSLayer: public cSimpleModule
         /// Added for Unicast/Broadcast version ///
         int NUMNODES;
         int NUMDATA;
-        /// Aqui iba el vector
+        ///// lol
         int alreadyInfected;
         int newInfected;
         int tries;

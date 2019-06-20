@@ -285,11 +285,10 @@ void KRRSLayer::handleMessage(cMessage *msg)
                         dataMsg->setValidUntilTime(cacheEntry->validUntilTime);
                         dataMsg->setFinalDestinationNodeName(cacheEntry->finalDestinationNodeName.c_str());
                         
-                        
+                        send(dataMsg, "lowerLayerOut");
 
                         y += 1;
                         EV_INFO << "--------------------------------------------------------------------\n";
-                        /* EV_INFO << "NODE " << getParentModule()->getIndex() << " HAS " << numNeigh << " NEIGHBORS\n";*/
                         // EV_INFO << "NODE " << getParentModule()->getIndex() << " HAS DATA AND IS ITS TURN. BROADCASTING TO NEIGHBORS. ROUND "<< (x+1) <<" \n";
                         EV_INFO << "NODE " << getParentModule()->getIndex() << " HAS DATA AND IS ITS TURN. BROADCASTING TO NEIGHBORS. ROUND "<< y <<" \n";
                                                 
@@ -310,8 +309,7 @@ void KRRSLayer::handleMessage(cMessage *msg)
                                     << "<alpha>" << xmlOut.alpha << "</alpha>\n"
                                     << "<tries>" << xmlOut.alpha_tries << "</tries>\n"
                                     << "<jumps>" << xmlOut.jumps << "</jumps>\n"
-                                    // << "<round>" << xmlOut.round << "</round>\n"
-                                    << "<round>" << y << "</round>\n"
+                                    << "<round>" << xmlOut.round << "</round>\n"
                                     << "<timestamp>" << simTime() << "</timestamp>\n"
                                     << "</message>\n";
                                 
@@ -324,7 +322,7 @@ void KRRSLayer::handleMessage(cMessage *msg)
 
                         // Select a random infected node for the next round
                         randomInfected(cacheEntry);
-                        
+
                         // ONLY FOR STATIC SCENARIOS: Stop simulation after one try
                         // if (x == 0){
                         //     delete msg;
@@ -337,7 +335,7 @@ void KRRSLayer::handleMessage(cMessage *msg)
                             
                         }
                         
-                        send(dataMsg, "lowerLayerOut");
+                        
                         go =  false; // Broadcast done
                         
                         
@@ -345,7 +343,7 @@ void KRRSLayer::handleMessage(cMessage *msg)
                             << dataMsg->getDestinationAddress() << ">!<" << dataMsg->getDataName() << ">!<" << dataMsg->getGoodnessValue() << ">!<"
                             << dataMsg->getByteLength() << "\n";} */
                     
-                    }  else { // if ( commTable.find("sender" + to_string(x))->second == getParentModule()->getIndex() && (firstDataCreated == true)  && go == true) { 
+                    }  //else { // if ( commTable.find("sender" + to_string(x))->second == getParentModule()->getIndex() && (firstDataCreated == true)  && go == true) { 
                     
                         // The current sender does not have data to send, so continue with the next one
                         
@@ -389,7 +387,7 @@ void KRRSLayer::handleMessage(cMessage *msg)
                         // }
 
                         // go = true; // Next commTable entry
-                    }
+                   // }
                 }
                 
                 delete msg;
@@ -482,8 +480,8 @@ void KRRSLayer::handleMessage(cMessage *msg)
                     
                     // Update the global cache
                     string messageID = omnetDataMsg->getDataName();
-                    
-                    //if (globalCache.find(messageID) != globalCache.end()){
+                  
+                    if (globalCache.find(messageID) != globalCache.end()){
                         string temp = globalCache.find(cacheEntry->dataName)->second;
                         temp = temp + "," + to_string(nodeIndex);
                         globalCache[messageID] = temp;
@@ -497,7 +495,7 @@ void KRRSLayer::handleMessage(cMessage *msg)
                             EV_INFO << "<infected_nodes>" << infectedNodes << "</infected_nodes>\n";
                             EV_INFO << "TOTAL INFECTED NODES = " << infectedNodes << "\n";
                         }                       
-                   // }
+                    }
                 }
                 
                 // After the cache of a node is updated the next broadcasting node can continue. This in order
@@ -600,14 +598,14 @@ KRRSLayer::SimOutData KRRSLayer::simOutData(KNeighbourListMsg *neighListMsg, Cac
         string delimiter = ",";
 
         // Extract node indices from the global cache string
-        int j = 0;
         while ((pos = strNodeIndices.find(delimiter)) != std::string::npos) {
             strNodeIndex = strNodeIndices.substr(0, pos);
-            infectedList.push_back(stoi(strNodeIndex)); // Save the infected nodes to a list                       
+            int search  = std::count(infectedList.begin(), infectedList.end(), stoi(strNodeIndex));
+            if( search == 0){
+                infectedList.push_back(stoi(strNodeIndex)); // Save the infected nodes to a list  
+            }                     
             strNodeIndices.erase(0, pos + delimiter.length());
-            j++;
         }
-    
     }
     
     // Extract node indices from the neighbor list.
@@ -691,7 +689,7 @@ KRRSLayer::SimOutData KRRSLayer::simOutData(KNeighbourListMsg *neighListMsg, Cac
         outData->alpha = alpha;
         outData->alpha_tries = statAlphaTries;
         outData->jumps = stateJumps;
-        outData->round = x + 1;
+        outData->round = y; // NEW 
         outData->event_label = eventLabel;
         outData->success = success;
 
@@ -703,7 +701,7 @@ KRRSLayer::SimOutData KRRSLayer::simOutData(KNeighbourListMsg *neighListMsg, Cac
         outData->alpha = alpha;
         outData->alpha_tries = statAlphaTries;
         outData->jumps = stateJumps;
-        outData->round = x + 1;
+        outData->round = y; // NEW
         outData->event_label = eventLabel;
         outData->success = success;
     }
