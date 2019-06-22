@@ -7,7 +7,7 @@ import datetime
 
 def main():
     runs = 10100
-    for x in range(666, runs+1)  # for x in range (0, runs):
+    for x in range(666, runs+1):  # for x in range (0, runs):
         modify_seed(x)
         call(["./ops-simu-run.sh", "-m", "cmdenv"])
         print ("### Simulation run %s" %x + " done! ###")
