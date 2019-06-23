@@ -8,8 +8,8 @@ import datetime
 def main():
     runs = 10200
     for x in range (0, runs):
-        if (x != 0) or (x != 1) or (x != 12) or (x != 13) or (x != 665):  # Problematic seeds
-            modify_seed(x)
+        modify_seed(x)
+        if (x != 0) or (x != 1) or (x != 12) or (x != 13) or (x != 665):  # Skip problematic seeds
             call(["./ops-simu-run.sh", "-m", "cmdenv"])
             print ("### Simulation run %s" %x + " done! ###")
             if (x+1) == runs:
@@ -24,7 +24,7 @@ def modify_seed(seed):
         filedata = file.read()
 
     # Replace the target string
-    if seed == 2:
+    if seed == 0:
         filedata = filedata.replace('seed-0-mt = ${{repetition}}'.format(42), 'seed-0-mt = ' + str(seed) )
     else:
         filedata = filedata.replace('seed-0-mt = ' + str((seed - 1)), 'seed-0-mt = ' + str(seed) )
