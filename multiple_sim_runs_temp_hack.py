@@ -9,7 +9,7 @@ def main():
     runs = 10200
     for x in range (0, runs):
         modify_seed(x)
-        if (x != 0) or (x != 1) or (x != 12) or (x != 13) or (x != 665):  # Skip problematic seeds
+        if (x != 0) and (x != 1) and (x != 12) and (x != 13) and (x != 665):  # Skip problematic seeds
             call(["./ops-simu-run.sh", "-m", "cmdenv"])
             print ("### Simulation run %s" %x + " done! ###")
             if (x+1) == runs:
