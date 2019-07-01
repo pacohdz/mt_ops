@@ -6,8 +6,8 @@ from subprocess import call
 import datetime
 
 def main():
-    runs = 10200
-    for x in range (0, runs):
+    runs = 600
+    for x in range (1201, 1201+runs):
         modify_seed(x)
         if (x != 0) and (x != 1) and (x != 12) and (x != 13) and (x != 665):  # Skip problematic seeds
             call(["./ops-simu-run.sh", "-m", "cmdenv"])
@@ -24,7 +24,7 @@ def modify_seed(seed):
         filedata = file.read()
 
     # Replace the target string
-    if seed == 0:
+    if seed == 1201:
         filedata = filedata.replace('seed-0-mt = ${{repetition}}'.format(42), 'seed-0-mt = ' + str(seed) )
     else:
         filedata = filedata.replace('seed-0-mt = ' + str((seed - 1)), 'seed-0-mt = ' + str(seed) )
